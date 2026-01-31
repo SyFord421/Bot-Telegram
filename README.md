@@ -5,7 +5,7 @@
 
 Ini adalah dokumentasi perjalanan saya belajar coding secara otodidak melalui perangkat mobile (Android). Project ini bukan sekadar bot, tapi bukti proses saya memahami **Object-Oriented Programming (OOP)** dan **Asynchronous Logic** di lingkungan terbatas.
 
-## 🚀 Fitur Utama
+## 🚀 Fitur Utama(Comming soon)
 - **Weather Forecast**: Integrasi real-time dengan OpenWeather API untuk memberikan saran pakaian berdasarkan suhu 🌡️.
 - **Smart Reminder**: Sistem pengingat berbasis waktu menggunakan *multi-threading* agar bot tetap responsif ⏰.
 - **OOP Structure**: Menggunakan konsep *Inheritance* (pewarisan) untuk kode yang lebih modular dan bersih.
