@@ -30,11 +30,24 @@ class BaseBot:
             weather = weatherdata['weather'][0]['main']
             desc = weatherdata['weather'][0]['description']
             temp = weatherdata['main']['temp']
-            msg = (f"---- Forecast Hari ini---\n 📍 Kota : {self.city}\n ☁ Cuaca : {weather}\n 🌡 Suhu : {temp}°C\n 📄 deskripsi : {desc}")
+            return weather, desc, temp
             self.send_message(msg)
         except Exception as e:
-            print(f"[!] Error Tidak dapat mendapatakan data {e}")
+            return None, None, None
+
+    def full_report(self):
+        try:
+            weather, desc, temp = self.get_weather_info()
+            if temp <= 22:
+                message = "🥶 Dingin banget jangan lupa pake hoodie yah biar nggak kedinginan "
+            elif temp >= 29:
+                message = "🌤 cuaca-nya panas banget hari ini jangan lupa banyakin minum air putih biar nggak dehidrasi"
+            else:
+                message = "Suhu yang pas untuk jalan-jalan 🍃"
+            self.send_message(f"\n ☁ Local Forecast ☁ \n📍 Kota: {self.city}\n ☁ Cuaca  : {desc.capitalize()}\n🌡 Suhu : {temp}°C\n {message}")
+        except Exception as e:
+            self.send_message(f"Error:\n{e}")
 
 if __name__ == "__main__":
     BB = BaseBot(key['BOT_TELEGRAM'], key['ID_CHAT'], key['API_CUACA'], key['KOTA'])
-    BB.get_weather_info()
+    BB.full_report()
