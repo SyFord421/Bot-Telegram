@@ -23,7 +23,7 @@ class BaseBot:
         try:
             url = f"http://api.openweathermap.org/data/2.5/weather?q={self.city}&appid={self.weather_token}&units=metric&lang=id"
             #&lang=id agar data yang di kirim bebahasa indonnesia
-            weatherdata = requests.get(url).json()#Mengubah response mentah dari API menjadi dictionary Python agar mudah diolah.
+            weatherdata = requests.get(url).json()
             if weatherdata.get("cod") != 200:
                 print(f"[!] Error: {weatherdata.get('message', 'Kota tidak ditemukan')}")
                 return
@@ -31,8 +31,7 @@ class BaseBot:
             desc = weatherdata['weather'][0]['description']
             temp = weatherdata['main']['temp']
             return weather, desc, temp
-            self.send_message(msg)
-        except Exception as e:
+        except Exception:
             return None, None, None
 
     def full_report(self):
