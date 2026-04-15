@@ -2,9 +2,11 @@ import telebot.async_telebot
 from config import key
 import aiohttp
 import asyncio
+import pprint as p
+import json
 
 class BaseBot:
-    """inisiasi class utama"""
+    """inisiasi class dasar"""
     def __init__(self):
         self.id_chat = key['ID_CHAT']
         self.bot = telebot.async_telebot.AsyncTeleBot(key['BOT_TELEGRAM'])
@@ -24,19 +26,46 @@ class Weather_Bot(BaseBot):
         self.city_name = city_name
         
         
-    async def get_weather_info(self) -> tuple[str, float] | None:
-        """"Mengambil data cuaca dari API dan mengirimkannya ke Telegram.""" 
+    def save_to_json(self, data):
+        with open("databmkg.json", 'w') as f:
+            json.dump(data, f, indent=2)
+        
+    async def get_weather_info(self) -> tuple | None:
+        """"Mengambil data cuaca dari API.""" 
         try:
             url = f"https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4={self.regional_code}"
-            #&lang=id agar data yang di kirim bebahasa indonnesia
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as response:
-                    data = await response.json()
-            desc = data['data'][0]['cuaca'][0][0]['weather_desc']
-            temp = data['data'][0]['cuaca'][0][0]['t']
-            return desc, temp 
+                    response = await response.json()
+            return response
         except Exception:
             return None
+            
+    async def weather_data_parser(self, raw_data: dict) -> dict | None:
+        """fungsi khusus untuk memproses data dari api bmkg agar menjadi dictionary yang lebih sederhana"""
+        try:
+            data_list = raw_data.get('data', [{}])[0]
+            locate = data_list.get('lokasi', {})
+            weather_nest = data_list.get('cuaca', [[]])
+            weather_today = weather_nest[0] if len(weather_nest) > 0 else []
+            now = weather_today[0] if len(weather_today) > 0 else {}
+            later = weather_today[1] if len(weather_today) > 1 else {}
+            return {
+                'city': locate.get('kotkab', 'unknown'),
+                'village': locate.get('desa', 'unknown'),
+                'now': {
+                    'temp': now.get('t', '-'),
+                    'desc': now.get('weather_desc', '-')
+                },
+                'later': {
+                    'temp': later.get('t', '-'),
+                    'desc': later.get('weather_desc', '-')
+                }
+            }
+        except Exception as e:
+            print(f"Debug Error: {e}") # Biar tau errornya apa
+            return None
+
 
 
     async def full_report(self):
@@ -60,8 +89,9 @@ class Weather_Bot(BaseBot):
             await asyncio.sleep(0.1)
         except Exception as e:
             await self.send_message(f"Error Report:\n{e}")
-
+    
 
 if __name__ == "__main__":
     bot = Weather_Bot(key['regional_code'], "Padaasih")
     asyncio.run(bot.full_report())
+    
